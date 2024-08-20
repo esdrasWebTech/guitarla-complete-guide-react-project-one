@@ -8,12 +8,18 @@ function App() {
     const [data, setData] = useState(db);
     const [cart, setCart] = useState([]);
 
+    const MAX_ITEMS = 5;
+    const MIN_ITEMS = 1;
+
     function addToCart(item){
         //check if the item already exists in the cart
         const itemExists = cart.findIndex( guitar => guitar.id === item.id );
 
-        //Add a new item to cart
+        //increment one to an existing item in the cart
         if( itemExists >= 0 ){
+
+            //Check that there are no more items of a guitar than the allowed limit
+            if(cart[itemExists].quantity >= MAX_ITEMS) return;
 
             const updatedCart = [...cart];
             updatedCart[itemExists].quantity++
@@ -30,7 +36,37 @@ function App() {
     }
 
     function increaseQuantity(id){
-        console.log('incrementando', id);
+        const updatedCart = cart.map( item => {
+            if(item.id === id && item.quantity < MAX_ITEMS){
+                return{
+                    ...item,
+                    quantity: item.quantity + 1
+                }
+            }
+
+            return item;
+        });
+
+        setCart(updatedCart);
+    }
+
+    function decreaseQuantity(id){
+        const updatedCart = cart.map( item =>{
+            if(item.id === id && item.quantity > MIN_ITEMS){
+                return{
+                    ...item,
+                    quantity: item.quantity - 1
+                }
+            }
+
+            return item;
+        })
+
+        setCart(updatedCart);
+    }
+
+    function clearCart(){
+        setCart([]);
     }
 
     return (
@@ -39,6 +75,8 @@ function App() {
                 cart={cart}
                 removeFromCart={removeFromCart}
                 increaseQuantity={increaseQuantity}
+                decreaseQuantity={decreaseQuantity}
+                clearCart={clearCart}
             />
 
             <main className="container-xl mt-5">
